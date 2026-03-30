@@ -15,7 +15,7 @@ internal import Version
 class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
 
     static let appUpdater = AppUpdater(
-        owner: "danielbuechele", repo: "goofy", releasePrefix: "Goofy")
+        owner: "retronprod", repo: "goofy-messenger", releasePrefix: "GoofyMess")
 
     private var cancellables = Set<AnyCancellable>()
 
