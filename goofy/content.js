@@ -383,6 +383,14 @@ window.__GOOFY = {
     }
   },
 
+  // Scroll past the hidden banner gap so content sits flush with the titlebar
+  fixScrollPosition: function () {
+    if (window.scrollY < document.documentElement.scrollHeight - window.innerHeight) {
+      window.scrollTo(0, document.documentElement.scrollHeight);
+      this.log("Fixed scroll position");
+    }
+  },
+
   init: function () {
     // In WKWebView mode, always initialize (no PWA check needed)
     this.log("Initializing Goofy");
@@ -393,6 +401,16 @@ window.__GOOFY = {
         "#mw-inbox-settings-menu",
         this.updateBadgeCount,
         true,
+      );
+
+      // Fix scroll position after banner is hidden
+      this.fixScrollPosition();
+      // Facebook's React may re-render and reset scroll, so watch for it
+      this.observe(
+        "scrollFix",
+        "body",
+        () => { this.fixScrollPosition(); },
+        false,
       );
     };
 
