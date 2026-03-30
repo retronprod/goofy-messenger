@@ -16,8 +16,8 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "E8B787232F0824D300DA162B"
-               BuildableName = "Goofy.app"
-               BlueprintName = "Goofy"
+               BuildableName = "GoofyMess.app"
+               BlueprintName = "GoofyMess"
                ReferencedContainer = "container:goofy.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -45,8 +45,8 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "E8B787232F0824D300DA162B"
-            BuildableName = "Goofy.app"
-            BlueprintName = "Goofy"
+            BuildableName = "GoofyMess.app"
+            BlueprintName = "GoofyMess"
             ReferencedContainer = "container:goofy.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
@@ -62,8 +62,8 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "E8B787232F0824D300DA162B"
-            BuildableName = "Goofy.app"
-            BlueprintName = "Goofy"
+            BuildableName = "GoofyMess.app"
+            BlueprintName = "GoofyMess"
             ReferencedContainer = "container:goofy.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
@@ -85,8 +85,8 @@
                   <BuildableReference
                      BuildableIdentifier = "primary"
                      BlueprintIdentifier = "E8B787232F0824D300DA162B"
-                     BuildableName = "Goofy.app"
-                     BlueprintName = "Goofy"
+                     BuildableName = "GoofyMess.app"
+                     BlueprintName = "GoofyMess"
                      ReferencedContainer = "container:goofy.xcodeproj">
                   </BuildableReference>
                </EnvironmentBuildable>

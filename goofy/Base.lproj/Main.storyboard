@@ -127,6 +127,12 @@
                                             </connections>
                                         </menuItem>
                                         <menuItem isSeparatorItem="YES" id="Kx9-n4-Rph"/>
+                                        <menuItem title="Login with Safari" keyEquivalent="l" id="safari-login-item">
+                                            <modifierMask key="keyEquivalentModifierMask" shift="YES" command="YES"/>
+                                            <connections>
+                                                <action selector="loginWithSafari:" target="Ady-hI-5gd" id="safari-login-action"/>
+                                            </connections>
+                                        </menuItem>
                                         <menuItem title="Log Out" id="Lgo-8t-Pzv">
                                             <modifierMask key="keyEquivalentModifierMask"/>
                                             <connections>

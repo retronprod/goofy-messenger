@@ -24,6 +24,7 @@ class ViewController: NSViewController {
     private var networkMonitor: NWPathMonitor?
     private var wasNetworkConnected = true
     private var windowConfigured = false
+    private var safariLoginController: SafariLoginController?
 
     // MARK: - Lifecycle
 
@@ -275,6 +276,17 @@ class ViewController: NSViewController {
         }
     }
 
+    // MARK: - Login with Safari Action
+
+    @IBAction func loginWithSafari(_ sender: Any?) {
+        let controller = SafariLoginController()
+        safariLoginController = controller
+        controller.startLogin { [weak self] in
+            self?.safariLoginController = nil
+            self?.loadMessenger()
+        }
+    }
+
     // MARK: - Log Out Action
 
     @IBAction func logOut(_ sender: Any?) {
@@ -478,7 +490,20 @@ extension ViewController: WKNavigationDelegate {
     }
 
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-        print("Page finished loading: \(webView.url?.absoluteString ?? "unknown")")
+        guard let url = webView.url else { return }
+        print("Page finished loading: \(url.absoluteString)")
+
+        // Auto-trigger Safari login when user lands on a login/auth page
+        let path = url.path.lowercased()
+        let host = url.host ?? ""
+        if host.contains("facebook.com") {
+            let isAuthPage = path.hasPrefix("/login") || path.hasPrefix("/checkpoint")
+                || path.hasPrefix("/two_step_verification") || path.hasPrefix("/recover")
+            if isAuthPage && safariLoginController == nil {
+                print("[Goofy] Detected login page, opening Safari login window")
+                loginWithSafari(nil)
+            }
+        }
     }
 
     func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
@@ -525,10 +550,40 @@ extension ViewController: WKUIDelegate {
         _ webView: WKWebView, createWebViewWith configuration: WKWebViewConfiguration,
         for navigationAction: WKNavigationAction, windowFeatures: WKWindowFeatures
     ) -> WKWebView? {
-        // Open in default browser instead of creating new window
-        if let url = navigationAction.request.url {
-            NSWorkspace.shared.open(url)
+        guard let url = navigationAction.request.url else { return nil }
+
+        // Keep auth-related popups in-app (2FA, login, checkpoint flows)
+        if let host = url.host, host.contains("facebook.com") || host.contains("messenger.com") {
+            let path = url.path.lowercased()
+            let authPaths = ["/login", "/checkpoint", "/two_step_verification", "/recover",
+                             "/cookie/consent", "/dialog", "/v2/dialog", "/auth"]
+            let isAuthPopup = authPaths.contains(where: { path.hasPrefix($0) })
+
+            if isAuthPopup {
+                // Create an in-app popup WKWebView that shares the same data store
+                let popupWebView = WKWebView(frame: webView.bounds, configuration: configuration)
+                popupWebView.navigationDelegate = self
+                popupWebView.uiDelegate = self
+                popupWebView.translatesAutoresizingMaskIntoConstraints = false
+
+                // Show in a new window
+                let popupWindow = NSWindow(
+                    contentRect: NSRect(x: 0, y: 0, width: 500, height: 600),
+                    styleMask: [.titled, .closable, .resizable],
+                    backing: .buffered,
+                    defer: false
+                )
+                popupWindow.title = "Facebook Login"
+                popupWindow.contentView = popupWebView
+                popupWindow.center()
+                popupWindow.makeKeyAndOrderFront(nil)
+
+                return popupWebView
+            }
         }
+
+        // Everything else: open in default browser
+        NSWorkspace.shared.open(url)
         return nil
     }
 

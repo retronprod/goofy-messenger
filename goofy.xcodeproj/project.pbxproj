@@ -13,7 +13,7 @@
 
 /* Begin PBXFileReference section */
 		6744A4F42F13238200407322 /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Base; path = Base.lproj/InfoPlist.strings; sourceTree = "<group>"; };
-		E8B787242F0824D300DA162B /* Goofy.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Goofy.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		E8B787242F0824D300DA162B /* GoofyMess.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GoofyMess.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -48,7 +48,7 @@
 		E8B787252F0824D300DA162B /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				E8B787242F0824D300DA162B /* Goofy.app */,
+				E8B787242F0824D300DA162B /* GoofyMess.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -56,9 +56,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		E8B787232F0824D300DA162B /* Goofy */ = {
+		E8B787232F0824D300DA162B /* GoofyMess */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = E8B7875E2F0824D400DA162B /* Build configuration list for PBXNativeTarget "Goofy" */;
+			buildConfigurationList = E8B7875E2F0824D400DA162B /* Build configuration list for PBXNativeTarget "GoofyMess" */;
 			buildPhases = (
 				E8B787202F0824D300DA162B /* Sources */,
 				E8B787212F0824D300DA162B /* Frameworks */,
@@ -71,11 +71,11 @@
 			fileSystemSynchronizedGroups = (
 				E8B787262F0824D300DA162B /* goofy */,
 			);
-			name = Goofy;
+			name = GoofyMess;
 			packageProductDependencies = (
 			);
 			productName = goofy;
-			productReference = E8B787242F0824D300DA162B /* Goofy.app */;
+			productReference = E8B787242F0824D300DA162B /* GoofyMess.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -110,7 +110,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				E8B787232F0824D300DA162B /* Goofy */,
+				E8B787232F0824D300DA162B /* GoofyMess */,
 			);
 		};
 /* End PBXProject section */
@@ -273,15 +273,15 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
 				CODE_SIGN_ENTITLEMENTS = goofy/goofy.entitlements;
-				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 152;
+				CURRENT_PROJECT_VERSION = 153;
 				DEVELOPMENT_TEAM = 284S9GQ87L;
 				ENABLE_APP_SANDBOX = NO;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = Goofy;
+				INFOPLIST_KEY_CFBundleDisplayName = GoofyMess;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.social-networking";
 				INFOPLIST_KEY_NSCameraUsageDescription = "Goofy needs camera access for video calls on Messenger";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
@@ -293,12 +293,12 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 15.6;
-				MARKETING_VERSION = 4.0.152;
+				MARKETING_VERSION = 4.0.153;
 				OTHER_LDFLAGS = (
 					"-framework",
 					WebKit,
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = cc.buechele.Goofy;
+				PRODUCT_BUNDLE_IDENTIFIER = com.retron.Goofymess;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
@@ -316,15 +316,15 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
 				CODE_SIGN_ENTITLEMENTS = goofy/goofy.entitlements;
-				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 152;
+				CURRENT_PROJECT_VERSION = 153;
 				DEVELOPMENT_TEAM = 284S9GQ87L;
 				ENABLE_APP_SANDBOX = NO;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = Goofy;
+				INFOPLIST_KEY_CFBundleDisplayName = GoofyMess;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.social-networking";
 				INFOPLIST_KEY_NSCameraUsageDescription = "Goofy needs camera access for video calls on Messenger";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
@@ -336,12 +336,12 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 15.6;
-				MARKETING_VERSION = 4.0.152;
+				MARKETING_VERSION = 4.0.153;
 				OTHER_LDFLAGS = (
 					"-framework",
 					WebKit,
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = cc.buechele.Goofy;
+				PRODUCT_BUNDLE_IDENTIFIER = com.retron.Goofymess;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
@@ -364,7 +364,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		E8B7875E2F0824D400DA162B /* Build configuration list for PBXNativeTarget "Goofy" */ = {
+		E8B7875E2F0824D400DA162B /* Build configuration list for PBXNativeTarget "GoofyMess" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				E8B7875F2F0824D400DA162B /* Debug */,

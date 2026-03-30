@@ -20,14 +20,16 @@
       "hidden" : false,
       "layers" : [
         {
+          "blend-mode" : "normal",
+          "fill" : "none",
           "glass" : true,
           "hidden" : false,
-          "image-name" : "Image.png",
-          "name" : "Image",
+          "image-name" : "icnsFile_b2c36d98532f86843e6c441852cba9c6_1741143740127.png",
+          "name" : "icnsFile_b2c36d98532f86843e6c441852cba9c6_1741143740127",
           "position" : {
-            "scale" : 1.2,
+            "scale" : 1.25,
             "translation-in-points" : [
-              3.000000106112566e-07,
+              0,
               0
             ]
           }
