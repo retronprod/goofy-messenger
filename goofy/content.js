@@ -391,6 +391,37 @@ window.__GOOFY = {
     }
   },
 
+  // Intercept clicks on download links and save via native bridge
+  setupDownloadInterceptor: function () {
+    document.addEventListener("click", (e) => {
+      const anchor = e.target.closest("a[download], a[href*='blob:']");
+      if (!anchor) return;
+
+      const href = anchor.href;
+      if (!href) return;
+
+      e.preventDefault();
+      e.stopPropagation();
+
+      this.log("Intercepted download link: " + href);
+
+      fetch(href)
+        .then(r => r.blob())
+        .then(blob => {
+          const reader = new FileReader();
+          reader.onload = () => {
+            this.postToNative({
+              type: "downloadBlob",
+              data: reader.result,
+              mimeType: blob.type,
+            });
+          };
+          reader.readAsDataURL(blob);
+        })
+        .catch(err => this.log("Download failed: " + err));
+    }, true);
+  },
+
   init: function () {
     // In WKWebView mode, always initialize (no PWA check needed)
     this.log("Initializing Goofy");
@@ -402,6 +433,9 @@ window.__GOOFY = {
         this.updateBadgeCount,
         true,
       );
+
+      // Intercept download links to save files natively
+      this.setupDownloadInterceptor();
 
       // Fix scroll position after banner is hidden
       this.fixScrollPosition();

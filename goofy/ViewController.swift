@@ -117,6 +117,9 @@ class ViewController: NSViewController {
         webView.translatesAutoresizingMaskIntoConstraints = false
         webView.navigationDelegate = self
         webView.uiDelegate = self
+        webView.onDownloadImage = { [weak self] url in
+            self?.downloadImageFromURL(url)
+        }
 
         // Allow back/forward navigation gestures
         webView.allowsBackForwardNavigationGestures = true
@@ -360,6 +363,82 @@ class ViewController: NSViewController {
         NSWorkspace.shared.open(url)
     }
 
+    private func downloadImageFromURL(_ url: URL) {
+        if url.scheme == "blob" {
+            downloadBlob(url: url.absoluteString)
+            return
+        }
+
+        // Download HTTPS image (e.g. from Facebook CDN)
+        let task = URLSession.shared.dataTask(with: url) { [weak self] data, response, error in
+            guard let data = data, error == nil else {
+                print("[Goofy] Image download failed: \(error?.localizedDescription ?? "unknown")")
+                return
+            }
+
+            let mimeType = response?.mimeType ?? "image/jpeg"
+            DispatchQueue.main.async {
+                self?.saveDataToDownloads(data: data, mimeType: mimeType)
+            }
+        }
+        task.resume()
+    }
+
+    private func saveDataToDownloads(data: Data, mimeType: String) {
+        let ext: String
+        switch mimeType {
+        case "image/jpeg": ext = "jpg"
+        case "image/png": ext = "png"
+        case "image/gif": ext = "gif"
+        case "image/webp": ext = "webp"
+        case "video/mp4": ext = "mp4"
+        case "application/pdf": ext = "pdf"
+        default: ext = mimeType.components(separatedBy: "/").last ?? "bin"
+        }
+
+        let downloadsURL = FileManager.default.urls(for: .downloadsDirectory, in: .userDomainMask).first!
+        let timestamp = Int(Date().timeIntervalSince1970)
+        let fileURL = downloadsURL.appendingPathComponent("Messenger_\(timestamp).\(ext)")
+
+        do {
+            try data.write(to: fileURL)
+            print("[Goofy] Saved file to \(fileURL.path)")
+            NSWorkspace.shared.activateFileViewerSelecting([fileURL])
+        } catch {
+            print("[Goofy] Failed to save file: \(error)")
+        }
+    }
+
+    private func downloadBlob(url blobURLString: String) {
+        let escaped = blobURLString.replacingOccurrences(of: "'", with: "\\'")
+        let js = """
+        (function() {
+            fetch('\(escaped)')
+                .then(r => r.blob())
+                .then(blob => {
+                    const reader = new FileReader();
+                    reader.onload = () => {
+                        webkit.messageHandlers.goofy.postMessage({
+                            type: 'downloadBlob',
+                            data: reader.result,
+                            mimeType: blob.type
+                        });
+                    };
+                    reader.readAsDataURL(blob);
+                })
+                .catch(e => console.error('Goofy blob download failed:', e));
+        })();
+        """
+        webView.evaluateJavaScript(js)
+    }
+
+    private func saveBlobToDownloads(dataURL: String, mimeType: String) {
+        guard let commaIndex = dataURL.firstIndex(of: ",") else { return }
+        let base64String = String(dataURL[dataURL.index(after: commaIndex)...])
+        guard let data = Data(base64Encoded: base64String) else { return }
+        saveDataToDownloads(data: data, mimeType: mimeType)
+    }
+
     // MARK: - Navigate to Thread
 
     func navigateToThread(threadKey: String) {
@@ -420,6 +499,12 @@ extension ViewController: WKScriptMessageHandler {
                 print("Inbox observer state: \(active)")
             }
 
+        case "downloadBlob":
+            if let dataURL = body["data"] as? String,
+               let mimeType = body["mimeType"] as? String {
+                saveBlobToDownloads(dataURL: dataURL, mimeType: mimeType)
+            }
+
         default:
             print("Unknown message type: \(type)")
         }
@@ -466,6 +551,13 @@ extension ViewController: WKNavigationDelegate {
     ) {
         guard let url = navigationAction.request.url else {
             decisionHandler(.allow)
+            return
+        }
+
+        // Download blob: URLs (used by Messenger for images, files, downloads)
+        if url.scheme == "blob" {
+            downloadBlob(url: url.absoluteString)
+            decisionHandler(.cancel)
             return
         }
 
@@ -551,6 +643,12 @@ extension ViewController: WKUIDelegate {
         for navigationAction: WKNavigationAction, windowFeatures: WKWindowFeatures
     ) -> WKWebView? {
         guard let url = navigationAction.request.url else { return nil }
+
+        // Download blob: URLs (images, files) to Downloads folder
+        if url.scheme == "blob" {
+            downloadBlob(url: url.absoluteString)
+            return nil
+        }
 
         // Keep auth-related popups in-app (2FA, login, checkpoint flows)
         if let host = url.host, host.contains("facebook.com") || host.contains("messenger.com") {
@@ -743,6 +841,10 @@ extension ViewController: UNUserNotificationCenterDelegate {
 /// the first 200px) when the window is wide enough (664px+), to cover the inset
 /// traffic light buttons. Otherwise it's a uniform 18px strip.
 class GoofyWebView: WKWebView {
+
+    /// Callback for downloading an image from a given URL
+    var onDownloadImage: ((URL) -> Void)?
+
     override func hitTest(_ point: NSPoint) -> NSView? {
         let dragHeight: CGFloat
         if bounds.width >= 664 && point.x <= 200 {
@@ -755,4 +857,59 @@ class GoofyWebView: WKWebView {
         }
         return super.hitTest(point)
     }
+
+    override func willOpenMenu(_ menu: NSMenu, with event: NSEvent) {
+        super.willOpenMenu(menu, with: event)
+
+        // Store right-click point for image detection
+        let locationInView = convert(event.locationInWindow, from: nil)
+        lastContextMenuPoint = CGPoint(
+            x: locationInView.x,
+            y: bounds.height - locationInView.y  // flip Y for JS coordinate system
+        )
+
+        for item in menu.items {
+            let title = item.title
+
+            // Replace "Open Image in New Window" with "Open in Safari"
+            if title.contains("in New Window") {
+                item.title = title.replacingOccurrences(of: "in New Window", with: "in Safari")
+            }
+
+            // Replace "Download Image" with our custom download
+            if title == "Download Image" || title == "Download Linked File" {
+                item.target = self
+                item.action = #selector(downloadImageMenuAction(_:))
+            }
+        }
+    }
+
+    @objc private func downloadImageMenuAction(_ sender: NSMenuItem) {
+        let js = """
+        (function() {
+            var el = document.elementFromPoint(
+                \(lastContextMenuPoint.x),
+                \(lastContextMenuPoint.y)
+            );
+            while (el) {
+                if (el.tagName === 'IMG' && el.src) return el.src;
+                if (el.tagName === 'VIDEO' && el.src) return el.src;
+                var source = el.querySelector('img[src], video source[src]');
+                if (source) return source.src;
+                el = el.parentElement;
+            }
+            return null;
+        })();
+        """
+        evaluateJavaScript(js) { [weak self] result, _ in
+            if let urlString = result as? String, let url = URL(string: urlString) {
+                print("[Goofy] Context menu download: \(urlString)")
+                self?.onDownloadImage?(url)
+            } else {
+                print("[Goofy] Could not find image URL at context menu point")
+            }
+        }
+    }
+
+    private var lastContextMenuPoint: CGPoint = .zero
 }
