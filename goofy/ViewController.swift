@@ -567,12 +567,9 @@ extension ViewController: WKNavigationDelegate {
             return
         }
 
-        // Everything else: open externally if it's a user click or a facebook.com
-        // page outside /messages. Allow programmatic redirects from unknown domains.
-        let shouldOpenExternally =
-            navigationAction.navigationType == .linkActivated
-            || (url.host?.contains("facebook.com") == true)
-        if shouldOpenExternally {
+        // User-clicked links: open externally. Programmatic redirects
+        // (e.g. facebook.com auth flows) stay in the WebView.
+        if navigationAction.navigationType == .linkActivated {
             NSWorkspace.shared.open(url)
             decisionHandler(.cancel)
             return
